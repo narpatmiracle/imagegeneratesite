@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Image Generator</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-image: url('./assets/21317.jpg');
+            /* Replace with your background image path */
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            /* Semi-transparent white background for content */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        #imagePreview {
+            margin-top: 20px;
+            max-width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="mb-4">Dynamic Image Generator</h1>
+        <form id="imageForm">
+            <div class="form-group">
+                <label for="uploadImage">Upload Image:</label>
+                <input type="file" class="form-control-file" id="uploadImage">
+            </div>
+            <div class="form-group">
+                <label for="nameInput">Enter Name:</label>
+                <input type="text" class="form-control" id="nameInput">
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Image</button>
+        </form>
+        <div id="imagePreview">
+            <!-- Image preview or generated image will be displayed here -->
+        </div>
+        <a id="downloadLink" class="btn btn-success mt-3" style="display: none;" download="generated-image.png">Download
+            Image</a>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        // JavaScript section in your HTML
+
+        // Initialize download link attributes when the page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            let downloadLink = document.getElementById('downloadLink');
+            downloadLink.style.display = 'none'; // Hide download link initially
+        });
+
+        document.getElementById('imageForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            let uploadedImage = document.getElementById('uploadImage').files[0];
+            let enteredName = document.getElementById('nameInput').value;
+
+            generateImage(uploadedImage, enteredName);
+        });
+
+        function generateImage(uploadedImage, enteredName) {
+            let backgroundImageUrl = './assets/background-img.png'; // Replace with your background image path
+
+            let backgroundImage = new Image();
+            backgroundImage.onload = function () {
+                let canvas = document.createElement('canvas');
+                canvas.width = backgroundImage.width;
+                canvas.height = backgroundImage.height;
+
+                let ctx = canvas.getContext('2d');
+                ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+
+                if (uploadedImage) {
+                    let img = new Image();
+                    img.src = URL.createObjectURL(uploadedImage);
+                    img.onload = function () {
+                        // Adjust the position and size of the uploaded image on the canvas
+                        let xPos = 698; // X position (horizontal)
+                        let yPos = 363; // Y position (vertical)
+                        let width = 335; // Width of the uploaded image on the canvas
+                        let height = 335; // Height of the uploaded image on the canvas
+
+                        // Draw the image on the canvas
+                        ctx.save(); // Save the current state of the context
+                        ctx.beginPath();
+                        let borderRadius = 0.09 * Math.min(width, height); // Calculate border-radius as 9% of the smaller dimension
+                        // Create a rounded rectangle clipping path
+                        ctx.moveTo(xPos + borderRadius, yPos);
+                        ctx.lineTo(xPos + width - borderRadius, yPos);
+                        ctx.arcTo(xPos + width, yPos, xPos + width, yPos + borderRadius, borderRadius);
+                        ctx.lineTo(xPos + width, yPos + height - borderRadius);
+                        ctx.arcTo(xPos + width, yPos + height, xPos + width - borderRadius, yPos + height, borderRadius);
+                        ctx.lineTo(xPos + borderRadius, yPos + height);
+                        ctx.arcTo(xPos, yPos + height, xPos, yPos + height - borderRadius, borderRadius);
+                        ctx.lineTo(xPos, yPos + borderRadius);
+                        ctx.arcTo(xPos, yPos, xPos + borderRadius, yPos, borderRadius);
+                        ctx.closePath();
+                        ctx.clip(); // Clip to the rounded rectangle path
+
+                        // Draw the image clipped to the rounded rectangle
+                        ctx.drawImage(img, xPos, yPos, width, height);
+
+                        ctx.restore(); // Restore the previous state (removes the clipping path)
+
+                        finalizeImage(canvas);
+                    };
+                }
+
+                if (enteredName) {
+                    ctx.font = 'bold 40px Arial'; // Adjust font size and family as needed
+                    ctx.fillStyle = '#fff'; // Text color
+                    ctx.fillText(enteredName, 750, 760); // Adjust position as needed
+                    finalizeImage(canvas);
+                }
+            };
+            backgroundImage.src = backgroundImageUrl;
+        }
+
+        function finalizeImage(canvas) {
+            let imagePreview = document.getElementById('imagePreview');
+            imagePreview.innerHTML = '';
+            imagePreview.appendChild(canvas);
+
+            let downloadLink = document.getElementById('downloadLink');
+            downloadLink.style.display = 'block'; // Make the download link visible
+
+            // Add event listener to trigger download when clicked
+            // Add event listener for the download button
+            downloadLink.addEventListener('click', function () {
+                // Create a new image object
+                let img = new Image();
+                img.crossOrigin = 'anonymous'; // Ensure CORS is set
+                img.src = 'file:///C:/Users/Miracle/Desktop/Image%20upload%20website/assets/background-img.png'; // Your image URL
+
+                img.onload = function () {
+                    // Draw the image onto the canvas
+                    let canvas = document.getElementById('yourCanvas');
+                    let ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+
+                    // Convert canvas content to a Blob
+                    canvas.toBlob(function (blob) {
+                        // Create temporary link element
+                        let a = document.createElement('a');
+                        a.style.display = 'none';
+                        document.body.appendChild(a);
+
+                        // Set download attributes
+                        let url = window.URL.createObjectURL(blob);
+                        a.href = url;
+                        a.download = 'generated-image.png';
+
+                        // Trigger download
+                        a.click();
+
+                        // Clean up
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                    }, 'image/png');
+                };
+            });
+
+        }
+
+    </script>
+</body>
+
+</html>
