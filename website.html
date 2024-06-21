@@ -66,15 +66,7 @@
 
     <!-- Custom JavaScript -->
     <script>
-        // JavaScript section in your HTML
-
-        // Initialize download link attributes when the page loads
-        document.addEventListener('DOMContentLoaded', function () {
-            let downloadLink = document.getElementById('downloadLink');
-            downloadLink.style.display = 'none'; // Hide download link initially
-        });
-
-        document.getElementById('imageForm').addEventListener('submit', function (event) {
+        document.getElementById('imageForm').addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent form submission
 
             let uploadedImage = document.getElementById('uploadImage').files[0];
@@ -87,7 +79,8 @@
             let backgroundImageUrl = './assets/background-img.png'; // Replace with your background image path
 
             let backgroundImage = new Image();
-            backgroundImage.onload = function () {
+            backgroundImage.crossOrigin = 'anonymous'; // Ensure CORS is set
+            backgroundImage.onload = function() {
                 let canvas = document.createElement('canvas');
                 canvas.width = backgroundImage.width;
                 canvas.height = backgroundImage.height;
@@ -98,7 +91,7 @@
                 if (uploadedImage) {
                     let img = new Image();
                     img.src = URL.createObjectURL(uploadedImage);
-                    img.onload = function () {
+                    img.onload = function() {
                         // Adjust the position and size of the uploaded image on the canvas
                         let xPos = 698; // X position (horizontal)
                         let yPos = 363; // Y position (vertical)
@@ -129,6 +122,8 @@
 
                         finalizeImage(canvas);
                     };
+                } else {
+                    finalizeImage(canvas);
                 }
 
                 if (enteredName) {
@@ -149,44 +144,20 @@
             let downloadLink = document.getElementById('downloadLink');
             downloadLink.style.display = 'block'; // Make the download link visible
 
-            // Add event listener to trigger download when clicked
-            // Add event listener for the download button
-            downloadLink.addEventListener('click', function () {
-                // Create a new image object
-                let img = new Image();
-                img.crossOrigin = 'anonymous'; // Ensure CORS is set
-                img.src = 'https://narpatmiracle.github.io/imagegeneratesite/assets/background-img.png'; // Your image URL
-
-                img.onload = function () {
-                    // Draw the image onto the canvas
-                    let canvas = document.getElementById('yourCanvas');
-                    let ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-
-                    // Convert canvas content to a Blob
-                    canvas.toBlob(function (blob) {
-                        // Create temporary link element
-                        let a = document.createElement('a');
-                        a.style.display = 'none';
-                        document.body.appendChild(a);
-
-                        // Set download attributes
-                        let url = window.URL.createObjectURL(blob);
-                        a.href = url;
-                        a.download = 'generated-image.png';
-
-                        // Trigger download
-                        a.click();
-
-                        // Clean up
-                        window.URL.revokeObjectURL(url);
-                        document.body.removeChild(a);
-                    }, 'image/png');
-                };
-            });
-
+            downloadLink.onclick = function() {
+                canvas.toBlob(function(blob) {
+                    let url = URL.createObjectURL(blob);
+                    let a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'generated-image.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                }, 'image/png');
+            };
         }
-
     </script>
 </body>
 
